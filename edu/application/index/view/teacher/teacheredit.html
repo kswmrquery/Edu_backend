@@ -1,0 +1,149 @@
+{extend name="public/Base" /}
+
+{block name="seo"}
+<title>{$title|default="页面标题"}</title>
+<meta name="keywords" content="{$keywords|default='页面关键字'}">
+<meta name="description" content="{$desc|default='页面描述'}">
+</head>
+
+<body>
+{/block}
+{block name="header"} {/block}  //关掉 header部分
+{block name="menu"} {/block}	//关掉 menu部分
+
+{block name="content"}
+<article class="cl pd-20">
+    <form action="" method="post" class="form form-horizontal" id="form-admin-add">
+        <div class="row cl">
+            <label class="form-label col-xs-4 col-sm-3"><span class="c-red">*</span>姓名：</label>
+            <div class="formControls col-xs-8 col-sm-9">
+                <input type="text" class="input-text" value="{$list.name}" placeholder="" id="name" name="name">
+            </div>
+        </div>
+        <div class="row cl">
+            <label class="form-label col-xs-4 col-sm-3">学历：</label>
+            <div class="formControls col-xs-8 col-sm-9"> <span class="select-box" style="width:150px;">
+				<select class="select" name="degree" size="1">
+                    {if condition="$list.degree eq '专科'"}
+                    <option value="1">专科</option>
+					<option value="2">本科</option>
+                    <option value="3">研究生</option>
+                    {elseif condition="$list.degree eq '本科'" /}
+                    <option value="2">本科</option>
+                    <option value="1">专科</option>
+                    <option value="3">研究生</option>
+                    {else /}
+                    <option value="3">研究生</option>
+                    <option value="1">专科</option>
+					<option value="2">本科</option>
+                    {/if}
+				</select>
+				</span> </div>
+        </div>
+        <div class="row cl">
+            <label class="form-label col-xs-4 col-sm-3"><span class="c-red">*</span>毕业学校：</label>
+            <div class="formControls col-xs-8 col-sm-9">
+                <input type="text" class="input-text" value="{$list.school}" placeholder="" id="school" name="school">
+            </div>
+        </div>
+        <div class="row cl">
+            <label class="form-label col-xs-4 col-sm-3"><span class="c-red">*</span>手机号：</label>
+            <div class="formControls col-xs-8 col-sm-9">
+                <input type="text" class="input-text" value="{$list.mobile}" placeholder="" id="mobile" name="mobile">
+            </div>
+        </div>
+        <div class="row cl">
+            <label class="form-label col-xs-4 col-sm-3"><span class="c-red">*</span>入职时间：</label>
+            <div class="formControls col-xs-8 col-sm-9">
+                <input type="text" class="input-text" value="{$list.hiredate}" placeholder="" id="hiredate" name="hiredate">
+            </div>
+        </div>
+        <div class="row cl">
+            <label class="form-label col-xs-4 col-sm-3">分配班：</label>
+            <div class="formControls col-xs-8 col-sm-9"> <span class="select-box" style="width:150px;">
+				<select class="select" name="grade_id" size="1">
+                    {if condition="$grade.id eq NULL"}
+                        <option value="0">不分配</option>
+                        {volist name="fen_list" id="vo"}
+                            <option value="{$vo.id}">{$vo.name}</option>
+                        {/volist}
+                    {else /}
+                        <option value="{$grade.id}">{$grade.name}</option>
+                        {volist name="fen_list" id="vo"}
+                            <option value="{$vo.id}">{$vo.name}</option>
+                        {/volist}
+                        <option value="0">不分配</option>
+                    {/if}
+				</select>
+				</span> </div>
+        </div>
+        <div class="row cl">
+            <label class="form-label col-xs-4 col-sm-3"><span class="c-red">*</span>启用状态</label>
+            <div class="formControls col-xs-8 col-sm-9 skin-minimal">
+                {if condition="$list.status eq '已启用'"}
+                <div class="radio-box">
+                    <input name="status" type="radio" id="sta-1" value="1" checked>
+                    <label for="sta-1">启用</label>
+                </div>
+                <div class="radio-box">
+                    <input type="radio" id="sta-2" name="status" value="0">
+                    <label for="sta-2">禁用</label>
+                </div>
+                {else /}
+                <div class="radio-box">
+                    <input name="status" type="radio" id="sta-1" value="1">
+                    <label for="sta-1">启用</label>
+                </div>
+                <div class="radio-box">
+                    <input type="radio" id="sta-2" name="status" value="0" checked>
+                    <label for="sta-2">禁用</label>
+                </div>
+                {/if}
+            </div>
+        </div>
+        <!--将当前记录的id做为隐藏域发送到服务器-->
+        <input type="hidden" value="{$list.id}" name="id">
+        <div class="row cl">
+            <div class="col-xs-8 col-sm-9 col-xs-offset-4 col-sm-offset-3">
+                <input class="btn btn-primary radius" type="submit" value="&nbsp;&nbsp;提交&nbsp;&nbsp;" id="submit">
+            </div>
+        </div>
+    </form>
+</article>
+{/block}
+
+{block name="js"}
+<!--请在下方写此页面业务相关的脚本-->
+<script type="text/javascript" src="__STATIC__/lib/jquery.validation/1.14.0/jquery.validate.js"></script>
+<script type="text/javascript" src="__STATIC__/lib/jquery.validation/1.14.0/validate-methods.js"></script>
+<script type="text/javascript" src="__STATIC__/lib/jquery.validation/1.14.0/messages_zh.js"></script>
+<script type="text/javascript">
+    $(function(){
+
+        $("form").children().change(function(){
+            $("#submit").removeClass('disabled');
+        });
+
+        $("#submit").on('click', function (event) {
+            $.ajax({
+                type: 'POST',
+                url: "{:url('teacher/editTeacher')}",
+                data: $("#form-admin-add").serialize(),
+                dataType: 'json',
+                success: function (data) {
+                    if(data.status == 1){
+                        alert(data.message);
+                    }
+                    else {
+                        alert(data.message);
+                        // 要做adminlist页面的刷新功能
+                    }
+                }
+            });
+        });
+    });
+</script>
+<!--/请在上方写此页面业务相关的脚本-->
+{/block}
+</body>
+</html>

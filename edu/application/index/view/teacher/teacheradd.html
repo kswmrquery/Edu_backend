@@ -1,0 +1,134 @@
+{extend name="public/Base" /}
+
+{block name="seo"}
+<title>{$title|default="页面标题"}</title>
+<meta name="keywords" content="{$keywords|default='页面关键字'}">
+<meta name="description" content="{$desc|default='页面描述'}">
+</head>
+
+<body>
+{/block}
+{block name="header"} {/block}  //关掉 header部分
+{block name="menu"} {/block}	//关掉 menu部分
+
+{block name="content"}
+<article class="cl pd-20">
+    <form action="" method="post" class="form form-horizontal" id="form-admin-add">
+        <div class="row cl">
+            <label class="form-label col-xs-4 col-sm-3"><span class="c-red">*</span>姓名：</label>
+            <div class="formControls col-xs-8 col-sm-9">
+                <input type="text" class="input-text" value="" placeholder="" id="name" name="name">
+            </div>
+        </div>
+        <div class="row cl">
+            <label class="form-label col-xs-4 col-sm-3">学历：</label>
+            <div class="formControls col-xs-8 col-sm-9"> <span class="select-box" style="width:150px;">
+				<select class="select" name="degree" size="1">
+					<option value="1">专科</option>
+					<option value="2">本科</option>
+                    <option value="3">研究生</option>
+				</select>
+				</span> </div>
+        </div>
+        <div class="row cl">
+            <label class="form-label col-xs-4 col-sm-3"><span class="c-red">*</span>毕业学校：</label>
+            <div class="formControls col-xs-8 col-sm-9">
+                <input type="text" class="input-text" value="" placeholder="" id="school" name="school">
+            </div>
+        </div>
+        <div class="row cl">
+            <label class="form-label col-xs-4 col-sm-3"><span class="c-red">*</span>手机号：</label>
+            <div class="formControls col-xs-8 col-sm-9">
+                <input type="text" class="input-text" value="" placeholder="" id="mobile" name="mobile">
+            </div>
+        </div>
+        <div class="row cl">
+            <label class="form-label col-xs-4 col-sm-3"><span class="c-red">*</span>入职时间：</label>
+            <div class="formControls col-xs-8 col-sm-9">
+                <input type="date" class="input-text" value="" placeholder="" id="hiredate" name="hiredate">
+            </div>
+        </div>
+        <div class="row cl">
+            <label class="form-label col-xs-4 col-sm-3"><span class="c-red">*</span>启用状态</label>
+            <div class="formControls col-xs-8 col-sm-9 skin-minimal">
+                <div class="radio-box">
+                    <input name="status" type="radio" id="sta-1" value="1" checked>
+                    <label for="sta-1">启用</label>
+                </div>
+                <div class="radio-box">
+                    <input type="radio" id="sta-2" name="status" value="0">
+                    <label for="sta-2">禁用</label>
+                </div>
+            </div>
+        </div>
+        <div class="row cl">
+            <label class="form-label col-xs-4 col-sm-3">负责班级：</label>
+            <div class="formControls col-xs-8 col-sm-9"> <span class="select-box" style="width:150px;">
+				<select class="select" name="grade_id" size="1">
+                    <option value="0">不分配</option>
+                    {volist name="grade_list" id="vo"}
+					<option value="{$vo.id}">{$vo.name}</option>
+                    {/volist}
+				</select>
+				</span> </div>
+        </div>
+        <div class="row cl">
+            <div class="col-xs-8 col-sm-9 col-xs-offset-4 col-sm-offset-3">
+                <input class="btn btn-primary radius" type="submit" value="&nbsp;&nbsp;提交&nbsp;&nbsp;" id="submit">
+            </div>
+        </div>
+    </form>
+</article>
+{/block}
+
+{block name="js"}
+<!--请在下方写此页面业务相关的脚本-->
+<script type="text/javascript" src="__STATIC__/lib/jquery.validation/1.14.0/jquery.validate.js"></script>
+<script type="text/javascript" src="__STATIC__/lib/jquery.validation/1.14.0/validate-methods.js"></script>
+<script type="text/javascript" src="__STATIC__/lib/jquery.validation/1.14.0/messages_zh.js"></script>
+<script type="text/javascript">
+
+    $(function(){
+
+        $("form").children().change(function(){
+            $("#submit").removeClass('disabled');
+        });
+
+        $("#name").blur(function () {
+            $.ajax({
+                type: 'GET',
+                url: "{:url('teacher/checkTeacherName')}",
+                data: {name:$(this).val()},
+                dataType: 'json',
+                success: function(data) {
+                    if(data.status == 0){
+                        alert(data.message);
+                        $("#name").val('');
+                    }
+                }
+            });
+        });
+
+        $("#submit").on('click', function (event) {
+            $.ajax({
+                type: 'POST',
+                url: "{:url('teacher/addTeacher')}",
+                data: $("#form-admin-add").serialize(),
+                dataType: 'json',
+                success: function (data) {
+                    if(data.status == 1){
+                        alert(data.message);
+                    }
+                else {
+                        alert(data.message);
+                        // 要做adminlist页面的刷新功能
+                    }
+                }
+            });
+        });
+    });
+</script>
+<!--/请在上方写此页面业务相关的脚本-->
+{/block}
+</body>
+</html>
